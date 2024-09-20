@@ -14,23 +14,29 @@ on:
       - "develop"
 
 jobs:
+
+  # Job to build the project and ensure it compiles without errors
   build:
-    name: Build and Test my-app Application
-    
+    name: Build my-app Application
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        java: [17, 21]  # Test with both Java 17 and 21 (to ensure compatibility)
+        
     steps:
+    
       - uses: actions/checkout@v4
       
-      # Set up JDK 21 with Maven
-      - name: Set up JDK 21
+      # Set up JDK with Maven
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: maven
 
-      # Cache the Maven dependencies (for more efficiency and speed)
+      # Cache the Maven dependencies (for more efficiency and speed up future builds)
       - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
@@ -39,19 +45,93 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Build with Maven
+      # Build the application with Maven
       - name: Build with Maven
         run: mvn -B -f my-app/pom.xml clean install
 
-      # Run the tests
+      # Upload build artifacts (e.g., JAR, WAR files)
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-app
+          path: my-app/target/*.jar
+
+      
+  # Job to run tests only if the build job succeeds
+  test:
+     name: Run Tests
+     runs-on: ubuntu-latest
+     needs: build  # Will run only if the 'build' job succeeds
+
+     steps:
+      - uses: actions/checkout@v4
+
+      # Set up JDK with Maven
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: maven
+          
+      # Run the tests with Maven
       - name: Run tests with Maven
         run: mvn -B -f my-app/pom.xml test
 
-  # Optional: Add notifications for build/test failures
-  notify:
-    if: failure()
+  # Job for code quality checks (e.g., static analysis, code coverage)
+  code_quality:
+    name: Code Quality Check
     runs-on: ubuntu-latest
+    needs: build  # Will run only if the 'build' job succeeds
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Set up JDK with Maven
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: maven
+
+      # Run static analysis tools (e.g., Checkstyle, SpotBugs)
+      - name: Run static analysis with SpotBugs
+        run: mvn com.github.spotbugs:spotbugs-maven-plugin:check
+
+      # Run code coverage tools (e.g., JaCoCo)
+      - name: Run code coverage with JaCoCo
+        run: mvn jacoco:report
+
+  # Job to check for outdated dependencies
+  dependency_check:
+    name: Dependency Updates Check
+    runs-on: ubuntu-latest
+    needs: build  # Will run only if the 'build' job succeeds
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+     # Set up JDK with Maven
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: maven
+
+      # Run Maven dependency updates check
+      - name: Check for Dependency Updates
+        run: mvn versions:display-dependency-updates
+
+  # Job to send notifications if any of the previous jobs failed
+  notify:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [build, test, code_quality, dependency_check]  # Will run if any of these jobs fail
+    if: failure()
     steps:
       - name: Send failure notification
-        run: |
-          echo "Build failed!"
+        run: echo "Build or test failed! Please check the logs."
+
