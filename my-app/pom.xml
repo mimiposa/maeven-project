@@ -5,7 +5,7 @@
 
   <groupId>com.exemple</groupId>
   <artifactId>my-app</artifactId>
-  <version>1.0-IG-456-user-authentication-IG-250-add-role-based-access-SNAPSHOT</version>
+  <version>1.0-IG-456-user-authentication-SNAPSHOT</version>
 
   <name>my-app</name>
   <url>http://www.example.com</url>
