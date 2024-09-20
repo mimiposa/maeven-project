@@ -41,7 +41,7 @@ jobs:
 
       # Build with Maven
       - name: Build with Maven
-        run: mvn -B clean install
+        run: mvn -B -f my-app/pom.xml clean install
 
       # Run the tests
       - name: Run tests with Maven
