@@ -104,6 +104,15 @@
           <version>1.21.0</version>
           <configuration>
             <!-- optional configuration -->
+            <gitFlowConfig>
+              <productionBranch>main</productionBranch>
+              <developmentBranch>develop</developmentBranch>
+              <featureBranchPrefix>feature/</featureBranchPrefix>
+              <releaseBranchPrefix>release/</releaseBranchPrefix>
+              <hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+              <supportBranchPrefix>support/</supportBranchPrefix>
+              <origin>origin</origin>
+            </gitFlowConfig>
           </configuration>
         </plugin>
         <plugin>
