@@ -7,11 +7,16 @@ on:
       - "develop"
       - "feature/*"
       - "release/*"
+      - "bugfix/*"
       - "hotfix/*"
   pull_request:
     branches:
       - "main"
       - "develop"
+      - "feature/*"
+      - "release/*"
+      - "bugfix/*"
+      - "hotfix/*"
 
 jobs:
 
