@@ -98,11 +98,11 @@ jobs:
 
       # Run static analysis tools (e.g., Checkstyle, SpotBugs)
       - name: Run static analysis with SpotBugs
-        run: mvn com.github.spotbugs:spotbugs-maven-plugin:check
+        run: mvn -f my-app/pom.xml com.github.spotbugs:spotbugs-maven-plugin:check
 
       # Run code coverage tools (e.g., JaCoCo)
       - name: Run code coverage with JaCoCo
-        run: mvn jacoco:report
+        run: mvn -f my-app/pom.xml jacoco:report
 
   # Job to check for outdated dependencies
   dependency_check:
@@ -123,7 +123,7 @@ jobs:
 
       # Run Maven dependency updates check
       - name: Check for Dependency Updates
-        run: mvn versions:display-dependency-updates
+        run: mvn -f my-app/pom.xml versions:display-dependency-updates
 
   # Job to send notifications if any of the previous jobs failed
   notify:
