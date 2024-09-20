@@ -45,7 +45,7 @@ jobs:
 
       # Run the tests
       - name: Run tests with Maven
-        run: mvn -B test
+        run: mvn -B -f my-app/pom.xml test
 
       # Optional: Upload dependency graph for Dependabot
       - name: Update dependency graph
