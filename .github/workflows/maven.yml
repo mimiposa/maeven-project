@@ -67,11 +67,11 @@ jobs:
      steps:
       - uses: actions/checkout@v4
 
-      # Set up JDK with Maven
-      - name: Set up JDK
+      # Set up JDK 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java }}
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
           
@@ -88,21 +88,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      # Set up JDK with Maven
-      - name: Set up JDK
+      # Set up JDK 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java }}
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
       # Run static analysis tools (e.g., Checkstyle, SpotBugs)
-      #- name: Run static analysis with SpotBugs
-      #  run: mvn com.github.spotbugs:spotbugs-maven-plugin:check
+      - name: Run static analysis with SpotBugs
+        run: mvn com.github.spotbugs:spotbugs-maven-plugin:check
 
       # Run code coverage tools (e.g., JaCoCo)
-      #- name: Run code coverage with JaCoCo
-      #  run: mvn jacoco:report
+      - name: Run code coverage with JaCoCo
+        run: mvn jacoco:report
 
   # Job to check for outdated dependencies
   dependency_check:
@@ -113,17 +113,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-     # Set up JDK with Maven
-      - name: Set up JDK
+     # Set up JDK 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java }}
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
       # Run Maven dependency updates check
-      #- name: Check for Dependency Updates
-      #  run: mvn versions:display-dependency-updates
+      - name: Check for Dependency Updates
+        run: mvn versions:display-dependency-updates
 
   # Job to send notifications if any of the previous jobs failed
   notify:
