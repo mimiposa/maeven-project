@@ -5,6 +5,7 @@
 
   <groupId>com.exemple</groupId>
   <artifactId>my-app</artifactId>
+
   <version>1.0.3</version>
 
   <name>my-app</name>
