@@ -26,7 +26,7 @@ jobs:
           echo "::set-output name=commits::$COMMITS"
 
       - name: Generate Conventional Commit Message Format
-        if: steps.count_commits.outputs.commits > 2
+        if: steps.count_commits.outputs.commits > 1
         run: |
           # Define commit type (feat, fix, etc.) based on labels or branch name
           if [[ "${{ github.event.pull_request.labels }}" == *"feature"* ]]; then
