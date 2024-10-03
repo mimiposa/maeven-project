@@ -1,0 +1,34 @@
+name: Auto Commit Message on Squash Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update_commit_message:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Generate Conventional Commit Message
+        run: |
+          # Define commit type (feat, fix, etc.) based on labels or branch name
+          if [[ "${{ github.event.pull_request.labels }}" == *"feature"* ]]; then
+            COMMIT_TYPE="feat"
+          elif [[ "${{ github.event.pull_request.labels }}" == *"bugfix"* || "${{ github.event.pull_request.labels }}" == *"fix"* ]]; then
+            COMMIT_TYPE="fix"
+          else
+            COMMIT_TYPE="chore"
+          fi
+
+          # Optionally extract scope from branch name or title (e.g., feature/scope-description)
+          BRANCH_NAME=${{ github.event.pull_request.head.ref }}
+          SCOPE=$(echo $BRANCH_NAME | grep -oE '^[a-zA-Z0-9_-]+')
+
+          # Generate Conventional Commit message
+          COMMIT_MESSAGE="${COMMIT_TYPE}(${SCOPE}): ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})"
+
+          # Amend the merge commit with the generated message
+          git commit --amend -m "$COMMIT_MESSAGE"
+
+      - name: Push amended commit
+        run: git push --force-with-lease
