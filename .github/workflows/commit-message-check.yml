@@ -34,7 +34,7 @@ jobs:
           echo "::set-output name=commits::$COMMITS"
 
       - name: Wait for Auto Update PR Title (if applicable)
-        if: steps.count_commits.outputs.commits > 2
+        if: steps.count_commits.outputs.commits > 1
         run: echo "Waiting for Auto Update PR Title to complete..."
 
       - name: Validate commit message
