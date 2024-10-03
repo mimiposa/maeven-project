@@ -2,6 +2,13 @@ name: Auto Update PR Title to Follow Conventional Commits
 
 on:
   pull_request:
+    branches:
+        - "main"
+        - "develop"
+        - "feature/*"
+        - "release/*"
+        - "bugfix/*"
+        - "hotfix/*"
     types: [opened, edited]
 
 jobs:
