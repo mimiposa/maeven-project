@@ -1,15 +1,14 @@
-name: Auto Commit Message on Squash Merge
+name: Auto Update PR Title to Follow Conventional Commits
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened, edited]
 
 jobs:
-  update_commit_message:
+  update_pr_title:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
-      - name: Generate Conventional Commit Message
+      - name: Generate Conventional Commit Message Format
         run: |
           # Define commit type (feat, fix, etc.) based on labels or branch name
           if [[ "${{ github.event.pull_request.labels }}" == *"feature"* ]]; then
@@ -24,11 +23,14 @@ jobs:
           BRANCH_NAME=${{ github.event.pull_request.head.ref }}
           SCOPE=$(echo $BRANCH_NAME | grep -oE '^[a-zA-Z0-9_-]+')
 
-          # Generate Conventional Commit message
-          COMMIT_MESSAGE="${COMMIT_TYPE}(${SCOPE}): ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})"
+          # Generate the new PR title using Conventional Commit format
+          PR_TITLE="${COMMIT_TYPE}(${SCOPE}): ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})"
 
-          # Amend the merge commit with the generated message
-          git commit --amend -m "$COMMIT_MESSAGE"
+          echo "New PR title: $PR_TITLE"
 
-      - name: Push amended commit
-        run: git push --force-with-lease
+          # Update the PR title with the new Conventional Commit message format
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} \
+            -d "{\"title\":\"$PR_TITLE\"}"
