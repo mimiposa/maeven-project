@@ -28,18 +28,22 @@ jobs:
       - name: Generate Conventional Commit Message Format
         if: steps.count_commits.outputs.commits > 1
         run: |
-          # Define commit type (feat, fix, etc.) based on labels or branch name
-          if [[ "${{ github.event.pull_request.labels }}" == *"feature"* ]]; then
+          # Extract branch name
+          BRANCH_NAME=${{ github.event.pull_request.head.ref }}
+
+          # Determine commit type based on the branch name
+          if [[ "$BRANCH_NAME" == feature/* ]]; then
             COMMIT_TYPE="feat"
-          elif [[ "${{ github.event.pull_request.labels }}" == *"bugfix"* || "${{ github.event.pull_request.labels }}" == *"fix"* ]]; then
+          elif [[ "$BRANCH_NAME" == bugfix/* || "$BRANCH_NAME" == hotfix/* ]]; then
             COMMIT_TYPE="fix"
+          elif [[ "$BRANCH_NAME" == release/* ]]; then
+            COMMIT_TYPE="release"
           else
             COMMIT_TYPE="chore"
           fi
 
-          # Optionally extract scope from branch name or title (e.g., feature/scope-description)
-          BRANCH_NAME=${{ github.event.pull_request.head.ref }}
-          SCOPE=$(echo $BRANCH_NAME | grep -oE '^[a-zA-Z0-9_-]+')
+          # Optionally extract scope from the branch name (e.g., feature/scope-description)
+          SCOPE=$(echo $BRANCH_NAME | cut -d'/' -f2)
 
           # Generate the new PR title using Conventional Commit format
           PR_TITLE="${COMMIT_TYPE}(${SCOPE}): ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})"
