@@ -9,7 +9,7 @@ on:
         - "release/*"
         - "bugfix/*"
         - "hotfix/*"
-    types: [opened, edited]
+    types: [opened, reopened, edited]
 
 jobs:
   update_pr_title:
