@@ -1,4 +1,4 @@
-name: Validate Commit Message
+name: 'Validate Commit Message'
 
 on:
   pull_request:
@@ -10,6 +10,11 @@ on:
       - "bugfix/*"
       - "hotfix/*"
     types: [opened, reopened, edited]
+
+  workflow_run:
+    workflows: [Auto Update PR Title to Follow Conventional Commits]
+    types:
+      - completed
 
 jobs:
   validate_commit_message:
@@ -29,7 +34,7 @@ jobs:
           echo "::set-output name=commits::$COMMITS"
 
       - name: Wait for Auto Update PR Title (if applicable)
-        if: steps.count_commits.outputs.commits > 1
+        if: steps.count_commits.outputs.commits > 2
         run: echo "Waiting for Auto Update PR Title to complete..."
 
       - name: Validate commit message
