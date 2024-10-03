@@ -2,20 +2,48 @@ name: 'Validate Commit Message'
 
 on:
   pull_request:
-    types: [opened, edited, synchronize]
+    branches:
+      - "main"
+      - "develop"
+      - "feature/*"
+      - "release/*"
+      - "bugfix/*"
+      - "hotfix/*"
+    types: [opened, reopened, edited]
+
+  workflow_run:
+    workflows: [Auto Update PR Title to Follow Conventional Commits]
+    types:
+      - completed
 
 jobs:
-  check-commit-message:
+  validate_commit_message:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Count commits in the PR
+        id: count_commits
+        run: |
+          COMMITS=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                   -H "Accept: application/vnd.github.v3+json" \
+                   https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits \
+                   | jq '. | length')
+          echo "Number of commits: $COMMITS"
+          echo "::set-output name=commits::$COMMITS"
+
+      - name: Wait for Auto Update PR Title (if applicable)
+        if: steps.count_commits.outputs.commits > 1
+        run: echo "Waiting for Auto Update PR Title to complete..."
+
       - name: Validate commit message
         run: |
-          PR_TITLE=$(jq -r .pull_request.title < $GITHUB_EVENT_PATH)
+          PR_TITLE=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                      -H "Accept: application/vnd.github.v3+json" \
+                      https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} \
+                      | jq -r .title)
           if ! [[ "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert|release)\: ]]; then
             echo "Invalid commit message format. Please follow the convention <type>: <description>"
             echo "Expected one of (feat, fix, docs, style, refactor, test, chore, build, ci, perf, revert, release) at the start of the commit message."
             exit 1
-          fi
