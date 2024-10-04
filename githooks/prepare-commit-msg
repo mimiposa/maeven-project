@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Only proceed if this is a merge commit
+if [ "$2" == "merge" ]; then
+  # Get the branch being merged and the current branch
+  branch_being_merged=$(git rev-parse --abbrev-ref ORIG_HEAD)
+  current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+  # Auto-generate the commit message
+  commit_message="chore: merge ${branch_being_merged} into ${current_branch}"
+
+  # Write the commit message to the file
+  echo "$commit_message" > "$1"
+fi
