@@ -42,11 +42,8 @@ jobs:
             COMMIT_TYPE="chore"
           fi
 
-          # Optionally extract scope from the branch name (e.g., feature/scope-description)
-          SCOPE=$(echo $BRANCH_NAME | cut -d'/' -f2)
-
           # Generate the new PR title using Conventional Commit format
-          PR_TITLE="${COMMIT_TYPE}(${SCOPE}): ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})"
+          PR_TITLE="${COMMIT_TYPE}: ${{ github.event.pull_request.title }}"
 
           echo "New PR title: $PR_TITLE"
 
