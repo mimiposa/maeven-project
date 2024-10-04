@@ -43,7 +43,7 @@ jobs:
           fi
 
           # Generate the new PR title using Conventional Commit format
-          PR_TITLE="${COMMIT_TYPE}: ${{ github.event.pull_request.title }}"
+          PR_TITLE="${COMMIT_TYPE}: ${BRANCH_NAME}"
 
           echo "New PR title: $PR_TITLE"
 
